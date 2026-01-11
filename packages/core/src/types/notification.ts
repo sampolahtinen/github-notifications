@@ -13,12 +13,7 @@ export type NotificationReason =
 /**
  * Subject types for GitHub notifications
  */
-export type SubjectType =
-  | "PullRequest"
-  | "Issue"
-  | "Release"
-  | "Discussion"
-  | "Commit";
+export type SubjectType = "PullRequest" | "Issue" | "Release" | "Discussion" | "Commit";
 
 /**
  * Repository owner information

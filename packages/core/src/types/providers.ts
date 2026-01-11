@@ -20,11 +20,7 @@ export interface StorageProvider {
  * Interface for native notification display
  */
 export interface NotificationDisplayProvider {
-  showNotification(
-    title: string,
-    body: string,
-    options?: NotificationOptions
-  ): Promise<void>;
+  showNotification(title: string, body: string, options?: NotificationOptions): Promise<void>;
   showBatchNotification(count: number, summary: string): Promise<void>;
 }
 

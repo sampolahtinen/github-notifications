@@ -1,20 +1,15 @@
-import type {
-  Notification,
-  GitHubAuthProvider,
-  StorageProvider,
-  PersistedState,
-} from "../types";
-import { DEFAULT_PERSISTED_STATE } from "../types";
 import {
-  type Result,
   type Failure,
-  ok,
-  err,
+  type Result,
   authFailure,
-  rateLimitFailure,
+  err,
   failureFromStatus,
   networkFailure,
+  ok,
+  rateLimitFailure,
 } from "../result";
+import type { GitHubAuthProvider, Notification, PersistedState, StorageProvider } from "../types";
+import { DEFAULT_PERSISTED_STATE } from "../types";
 
 const STORAGE_KEY = "github-notifications-state";
 const LOG_PREFIX = "core.notification_service";
@@ -25,7 +20,7 @@ const LOG_PREFIX = "core.notification_service";
 export class NotificationService {
   constructor(
     private authProvider: GitHubAuthProvider,
-    private storageProvider: StorageProvider
+    private storageProvider: StorageProvider,
   ) {}
 
   /**
@@ -82,12 +77,7 @@ export class NotificationService {
       console.error(`${LOG_PREFIX}.fetch: API error`, {
         status: response.status,
       });
-      return err(
-        failureFromStatus(
-          response.status,
-          `GitHub API error: ${response.status}`
-        )
-      );
+      return err(failureFromStatus(response.status, `GitHub API error: ${response.status}`));
     }
 
     const data = await response.json();
@@ -107,23 +97,16 @@ export class NotificationService {
 
     let response: Response;
     try {
-      response = await fetch(
-        `https://api.github.com/notifications/threads/${notificationId}`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-          },
-        }
-      );
+      response = await fetch(`https://api.github.com/notifications/threads/${notificationId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      });
     } catch (cause) {
-      console.error(
-        `${LOG_PREFIX}.markAsDone: network error`,
-        { notificationId },
-        cause
-      );
+      console.error(`${LOG_PREFIX}.markAsDone: network error`, { notificationId }, cause);
       return err(networkFailure(cause));
     }
 
@@ -135,16 +118,14 @@ export class NotificationService {
       return err(
         failureFromStatus(
           response.status,
-          `Failed to mark notification as done: ${response.status}`
-        )
+          `Failed to mark notification as done: ${response.status}`,
+        ),
       );
     }
 
     const state = await this.getState();
     state.doneNotificationIds.push(notificationId);
-    state.notifications = state.notifications.filter(
-      (n) => n.id !== notificationId
-    );
+    state.notifications = state.notifications.filter((n) => n.id !== notificationId);
     await this.saveState(state);
     return ok(undefined);
   }
@@ -152,14 +133,9 @@ export class NotificationService {
   /**
    * Snooze a notification until a specified time
    */
-  async snooze(
-    notificationId: string,
-    unsnoozeAt: Date
-  ): Promise<Result<void>> {
+  async snooze(notificationId: string, unsnoozeAt: Date): Promise<Result<void>> {
     const state = await this.getState();
-    const notification = state.notifications.find(
-      (n) => n.id === notificationId
-    );
+    const notification = state.notifications.find((n) => n.id === notificationId);
 
     if (!notification) {
       console.error(`${LOG_PREFIX}.snooze: notification not found`, {
@@ -175,9 +151,7 @@ export class NotificationService {
       unsnoozeAt: unsnoozeAt.toISOString(),
       notification,
     };
-    state.notifications = state.notifications.filter(
-      (n) => n.id !== notificationId
-    );
+    state.notifications = state.notifications.filter((n) => n.id !== notificationId);
     await this.saveState(state);
     return ok(undefined);
   }
@@ -200,9 +174,7 @@ export class NotificationService {
   /**
    * Transform GitHub API response to internal Notification type
    */
-  private transformNotifications(
-    data: GitHubNotificationResponse[]
-  ): Notification[] {
+  private transformNotifications(data: GitHubNotificationResponse[]): Notification[] {
     return data.map((item) => ({
       id: item.id,
       unread: item.unread,

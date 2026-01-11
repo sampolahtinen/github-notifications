@@ -46,7 +46,7 @@ export const err = <E>(error: E): Err<E> => ({ ok: false, error });
 export function failureFromStatus(
   status: number,
   message: string,
-  meta?: Record<string, string>
+  meta?: Record<string, string>,
 ): Failure {
   const codeMap: Record<number, FailureCode> = {
     401: "AUTH",
