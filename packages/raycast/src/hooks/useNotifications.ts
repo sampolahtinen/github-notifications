@@ -10,12 +10,15 @@ import { RaycastAuthProvider, RaycastStorageAdapter } from "../adapters";
 
 interface UseNotificationsResult {
   notifications: Notification[];
+  allNotifications: Notification[];
   isLoading: boolean;
   error: Failure | null;
   refresh: () => Promise<void>;
   markAsDone: (id: string) => Promise<void>;
   filterReason: NotificationReason | "all";
   setFilterReason: (reason: NotificationReason | "all") => void;
+  filterRepository: string;
+  setFilterRepository: (repositoryId: string) => void;
   lastUpdated: Date | null;
 }
 
@@ -24,6 +27,9 @@ export function useNotifications(): UseNotificationsResult {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Failure | null>(null);
   const [filterReason, setFilterReason] = useState<NotificationReason | "all">(
+    "all"
+  );
+  const [filterRepository, setFilterRepository] = useState<string | "all">(
     "all"
   );
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -85,19 +91,25 @@ export function useNotifications(): UseNotificationsResult {
     fetchNotifications();
   }, [fetchNotifications]);
 
-  const filteredNotifications =
-    filterReason === "all"
-      ? notifications
-      : notifications.filter((n) => n.reason === filterReason);
+  const filteredNotifications = notifications.filter((n) => {
+    const matchesReason = filterReason === "all" || n.reason === filterReason;
+    const matchesRepo =
+      filterRepository === "all" ||
+      n.repository.id === Number(filterRepository);
+    return matchesReason && matchesRepo;
+  });
 
   return {
     notifications: filteredNotifications,
+    allNotifications: notifications,
     isLoading,
     error,
     refresh: fetchNotifications,
     markAsDone,
     filterReason,
     setFilterReason,
+    filterRepository,
+    setFilterRepository,
     lastUpdated,
   };
 }

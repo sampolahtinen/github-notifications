@@ -24,14 +24,30 @@ const REASON_OPTIONS: { value: NotificationReason | "all"; title: string }[] = [
 export default function Command() {
   const {
     notifications,
+    allNotifications,
     isLoading,
     error,
     refresh,
     markAsDone,
     filterReason,
     setFilterReason,
+    filterRepository,
+    setFilterRepository,
     lastUpdated,
   } = useNotifications();
+
+  // Dedupe repositories for filter menu (use all notifications, not filtered)
+  const repositories = Array.from(
+    new Map(
+      allNotifications.map((n) => [n.repository.id, n.repository])
+    ).values()
+  );
+
+  // Get active repo name for display
+  const activeRepoName =
+    filterRepository !== "all"
+      ? repositories.find((r) => r.id === Number(filterRepository))?.fullName
+      : null;
 
   const subtitle = lastUpdated
     ? `${notifications.length} notifications · Updated ${formatRelativeTime(lastUpdated.toISOString())}`
@@ -66,6 +82,7 @@ export default function Command() {
   return (
     <List
       isLoading={isLoading}
+      navigationTitle={activeRepoName ? `📁 ${activeRepoName}` : "GitHub Inbox"}
       searchBarPlaceholder="Search notifications..."
       searchBarAccessory={
         <List.Dropdown
@@ -137,6 +154,45 @@ export default function Command() {
                         shortcut={{ modifiers: ["cmd"], key: "d" }}
                         onAction={() => markAsDone(notification.id)}
                       />
+                    </ActionPanel.Section>
+                    <ActionPanel.Section title="Filter">
+                      <ActionPanel.Submenu
+                        title="Filter by Repository"
+                        icon={Icon.Filter}
+                        shortcut={{ modifiers: ["cmd"], key: "f" }}
+                      >
+                        <Action
+                          title="All Repositories"
+                          icon={
+                            filterRepository === "all"
+                              ? Icon.Checkmark
+                              : Icon.Circle
+                          }
+                          onAction={() => setFilterRepository("all")}
+                        />
+                        {repositories.map((repo) => (
+                          <Action
+                            key={repo.id}
+                            title={repo.fullName}
+                            icon={
+                              filterRepository === String(repo.id)
+                                ? Icon.Checkmark
+                                : Icon.Circle
+                            }
+                            onAction={() =>
+                              setFilterRepository(String(repo.id))
+                            }
+                          />
+                        ))}
+                      </ActionPanel.Submenu>
+                      {filterRepository !== "all" && (
+                        <Action
+                          title="Clear Repository Filter"
+                          icon={Icon.XMarkCircle}
+                          shortcut={{ modifiers: ["cmd", "shift"], key: "f" }}
+                          onAction={() => setFilterRepository("all")}
+                        />
+                      )}
                     </ActionPanel.Section>
                     <ActionPanel.Section>
                       <Action.CopyToClipboard
