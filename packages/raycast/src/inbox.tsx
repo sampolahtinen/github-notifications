@@ -1,13 +1,163 @@
-import { List } from "@raycast/api";
+import {
+  List,
+  ActionPanel,
+  Action,
+  Icon,
+  Color,
+  openExtensionPreferences,
+} from "@raycast/api";
+import type { NotificationReason } from "@github-notifications/core";
+import { useNotifications } from "./hooks/useNotifications";
+import { formatRelativeTime, getReasonIcon, getReasonLabel } from "./utils";
+
+const REASON_OPTIONS: { value: NotificationReason | "all"; title: string }[] = [
+  { value: "all", title: "All Notifications" },
+  { value: "review_requested", title: "Review Requested" },
+  { value: "mention", title: "Mentions" },
+  { value: "assign", title: "Assigned" },
+  { value: "comment", title: "Comments" },
+  { value: "author", title: "Author" },
+  { value: "state_change", title: "State Changes" },
+  { value: "subscribed", title: "Subscribed" },
+];
 
 export default function Command() {
+  const {
+    notifications,
+    isLoading,
+    error,
+    refresh,
+    markAsDone,
+    filterReason,
+    setFilterReason,
+    lastUpdated,
+  } = useNotifications();
+
+  const subtitle = lastUpdated
+    ? `${notifications.length} notifications · Updated ${formatRelativeTime(lastUpdated.toISOString())}`
+    : `${notifications.length} notifications`;
+
+  if (error) {
+    return (
+      <List>
+        <List.EmptyView
+          icon={{ source: Icon.Warning, tintColor: Color.Red }}
+          title="Failed to load notifications"
+          description="Check your internet connection or GitHub token"
+          actions={
+            <ActionPanel>
+              <Action
+                title="Retry"
+                icon={Icon.RotateClockwise}
+                onAction={refresh}
+              />
+              <Action
+                title="Open Preferences"
+                icon={Icon.Gear}
+                onAction={openExtensionPreferences}
+              />
+            </ActionPanel>
+          }
+        />
+      </List>
+    );
+  }
+
   return (
-    <List>
-      <List.EmptyView
-        icon="🎉"
-        title="No notifications"
-        description="You're all caught up!"
-      />
+    <List
+      isLoading={isLoading}
+      searchBarPlaceholder="Search notifications..."
+      searchBarAccessory={
+        <List.Dropdown
+          tooltip="Filter by reason"
+          value={filterReason}
+          onChange={(value) =>
+            setFilterReason(value as NotificationReason | "all")
+          }
+        >
+          {REASON_OPTIONS.map((option) => (
+            <List.Dropdown.Item
+              key={option.value}
+              title={option.title}
+              value={option.value}
+            />
+          ))}
+        </List.Dropdown>
+      }
+    >
+      {notifications.length === 0 && !isLoading ? (
+        <List.EmptyView
+          icon="🎉"
+          title="No notifications"
+          description="You're all caught up!"
+        />
+      ) : (
+        <List.Section title="Notifications" subtitle={subtitle}>
+          {notifications.map((notification) => {
+            const { icon, color } = getReasonIcon(notification.reason);
+            const browserUrl = notification.subject.url
+              ? notification.subject.url
+                  .replace("api.github.com/repos", "github.com")
+                  .replace("/pulls/", "/pull/")
+              : `https://github.com/${notification.repository.fullName}`;
+
+            return (
+              <List.Item
+                key={notification.id}
+                icon={{ source: icon, tintColor: color }}
+                title={notification.subject.title}
+                subtitle={notification.repository.fullName}
+                accessories={[
+                  {
+                    text: formatRelativeTime(notification.updatedAt),
+                    tooltip: new Date(notification.updatedAt).toLocaleString(),
+                  },
+                  {
+                    tag: {
+                      value: getReasonLabel(notification.reason),
+                      color,
+                    },
+                  },
+                ]}
+                keywords={[
+                  notification.repository.fullName,
+                  notification.reason,
+                  notification.subject.type,
+                ]}
+                actions={
+                  <ActionPanel>
+                    <ActionPanel.Section>
+                      <Action.OpenInBrowser
+                        title="Open in Browser"
+                        url={browserUrl}
+                      />
+                      <Action
+                        title="Mark as Done"
+                        icon={Icon.Checkmark}
+                        shortcut={{ modifiers: ["cmd"], key: "d" }}
+                        onAction={() => markAsDone(notification.id)}
+                      />
+                    </ActionPanel.Section>
+                    <ActionPanel.Section>
+                      <Action.CopyToClipboard
+                        title="Copy URL"
+                        content={browserUrl}
+                        shortcut={{ modifiers: ["cmd"], key: "c" }}
+                      />
+                      <Action
+                        title="Refresh"
+                        icon={Icon.RotateClockwise}
+                        shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
+                        onAction={refresh}
+                      />
+                    </ActionPanel.Section>
+                  </ActionPanel>
+                }
+              />
+            );
+          })}
+        </List.Section>
+      )}
     </List>
   );
 }

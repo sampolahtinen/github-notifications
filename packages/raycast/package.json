@@ -63,6 +63,15 @@
       "required": false,
       "default": true,
       "label": "Enable native notifications"
+    },
+    {
+      "name": "autoStartListening",
+      "title": "Auto-start Listening",
+      "description": "Start polling when Raycast launches",
+      "type": "checkbox",
+      "required": false,
+      "default": false,
+      "label": "Auto-start background polling"
     }
   ],
   "dependencies": {
