@@ -10,6 +10,9 @@
     "Productivity"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "commands": [
     {
       "name": "inbox",
