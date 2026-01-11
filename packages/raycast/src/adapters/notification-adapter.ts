@@ -13,7 +13,7 @@ export class RaycastNotificationAdapter implements NotificationDisplayProvider {
     title: string,
     body: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    options?: NotificationOptions
+    _options?: NotificationOptions
   ): Promise<void> {
     await showHUD(`${title}: ${body}`);
   }
