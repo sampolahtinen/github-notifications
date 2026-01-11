@@ -33,6 +33,8 @@ export default function Command() {
     setFilterReason,
     filterRepository,
     setFilterRepository,
+    showReadNotifications,
+    toggleShowReadNotifications,
     lastUpdated,
   } = useNotifications();
 
@@ -131,6 +133,14 @@ export default function Command() {
                   },
                   {
                     tag: {
+                      value: notification.unread ? "Unread" : "Read",
+                      color: notification.unread
+                        ? Color.Blue
+                        : Color.SecondaryText,
+                    },
+                  },
+                  {
+                    tag: {
                       value: getReasonLabel(notification.reason),
                       color,
                     },
@@ -195,6 +205,18 @@ export default function Command() {
                       )}
                     </ActionPanel.Section>
                     <ActionPanel.Section>
+                      <Action
+                        title={
+                          showReadNotifications
+                            ? "Hide Read Notifications"
+                            : "Show Read Notifications"
+                        }
+                        icon={
+                          showReadNotifications ? Icon.EyeDisabled : Icon.Eye
+                        }
+                        shortcut={{ modifiers: ["cmd"], key: "r" }}
+                        onAction={toggleShowReadNotifications}
+                      />
                       <Action.CopyToClipboard
                         title="Copy URL"
                         content={browserUrl}

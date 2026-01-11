@@ -30,8 +30,12 @@ export class NotificationService {
 
   /**
    * Fetch notifications from GitHub API
+   * @param options.includeRead - If true, includes already read notifications
    */
-  async fetch(): Promise<Result<Notification[]>> {
+  async fetch(options?: {
+    includeRead?: boolean;
+  }): Promise<Result<Notification[]>> {
+    const includeRead = options?.includeRead ?? false;
     const token = await this.authProvider.getToken();
     if (!token) {
       console.error(`${LOG_PREFIX}.fetch: no token configured`);
@@ -40,7 +44,10 @@ export class NotificationService {
 
     let response: Response;
     try {
-      response = await fetch("https://api.github.com/notifications", {
+      const url = includeRead
+        ? "https://api.github.com/notifications?all=true"
+        : "https://api.github.com/notifications";
+      response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/vnd.github+json",

@@ -15,7 +15,9 @@ type ExtensionPreferences = {
   /** Native Notifications - Show macOS notifications for new items */
   "nativeNotifications": boolean,
   /** Auto-start Listening - Start polling when Raycast launches */
-  "autoStartListening": boolean
+  "autoStartListening": boolean,
+  /** Show Read Notifications - Include already read notifications in the list */
+  "showReadNotifications": boolean
 }
 
 /** Preferences accessible in all the extension's commands */

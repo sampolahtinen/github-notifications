@@ -72,6 +72,15 @@
       "required": false,
       "default": false,
       "label": "Auto-start background polling"
+    },
+    {
+      "name": "showReadNotifications",
+      "title": "Show Read Notifications",
+      "description": "Include already read notifications in the list",
+      "type": "checkbox",
+      "required": false,
+      "default": false,
+      "label": "Show read notifications"
     }
   ],
   "dependencies": {

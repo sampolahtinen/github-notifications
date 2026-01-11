@@ -19,6 +19,8 @@ interface UseNotificationsResult {
   setFilterReason: (reason: NotificationReason | "all") => void;
   filterRepository: string;
   setFilterRepository: (repositoryId: string) => void;
+  showReadNotifications: boolean;
+  toggleShowReadNotifications: () => void;
   lastUpdated: Date | null;
 }
 
@@ -32,6 +34,7 @@ export function useNotifications(): UseNotificationsResult {
   const [filterRepository, setFilterRepository] = useState<string | "all">(
     "all"
   );
+  const [showReadNotifications, setShowReadNotifications] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const service = useMemo(() => {
@@ -44,7 +47,9 @@ export function useNotifications(): UseNotificationsResult {
     setIsLoading(true);
     setError(null);
 
-    const result = await service.fetch();
+    const result = await service.fetch({
+      includeRead: showReadNotifications,
+    });
 
     if (result.ok) {
       setNotifications(result.value);
@@ -64,7 +69,7 @@ export function useNotifications(): UseNotificationsResult {
     }
 
     setIsLoading(false);
-  }, [service]);
+  }, [service, showReadNotifications]);
 
   const markAsDone = useCallback(
     async (id: string) => {
@@ -99,6 +104,10 @@ export function useNotifications(): UseNotificationsResult {
     return matchesReason && matchesRepo;
   });
 
+  const toggleShowReadNotifications = useCallback(() => {
+    setShowReadNotifications((prev) => !prev);
+  }, []);
+
   return {
     notifications: filteredNotifications,
     allNotifications: notifications,
@@ -110,6 +119,8 @@ export function useNotifications(): UseNotificationsResult {
     setFilterReason,
     filterRepository,
     setFilterRepository,
+    showReadNotifications,
+    toggleShowReadNotifications,
     lastUpdated,
   };
 }
