@@ -1,0 +1,84 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "github-notifications",
+  "title": "GitHub Notifications",
+  "description": "Manage GitHub notifications without leaving your workflow",
+  "icon": "icon.png",
+  "author": "sampolahtinen",
+  "categories": [
+    "Developer Tools",
+    "Productivity"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "inbox",
+      "title": "GitHub Inbox",
+      "description": "View and manage your GitHub notifications",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "githubToken",
+      "title": "GitHub Token",
+      "description": "Personal Access Token with 'notifications' and 'repo' scopes",
+      "type": "password",
+      "required": true
+    },
+    {
+      "name": "pollingInterval",
+      "title": "Polling Interval",
+      "description": "How often to check for new notifications",
+      "type": "dropdown",
+      "required": false,
+      "default": "60",
+      "data": [
+        {
+          "title": "30 seconds",
+          "value": "30"
+        },
+        {
+          "title": "60 seconds",
+          "value": "60"
+        },
+        {
+          "title": "2 minutes",
+          "value": "120"
+        },
+        {
+          "title": "5 minutes",
+          "value": "300"
+        }
+      ]
+    },
+    {
+      "name": "nativeNotifications",
+      "title": "Native Notifications",
+      "description": "Show macOS notifications for new items",
+      "type": "checkbox",
+      "required": false,
+      "default": true,
+      "label": "Enable native notifications"
+    }
+  ],
+  "dependencies": {
+    "@github-notifications/core": "workspace:*",
+    "@github-notifications/observability": "workspace:*",
+    "@github-notifications/storage": "workspace:*",
+    "@raycast/api": "^1.87.2"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.11",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "eslint": "^8.57.1",
+    "typescript": "^5.7.3"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop",
+    "lint": "eslint src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  }
+}
