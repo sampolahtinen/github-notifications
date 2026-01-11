@@ -45,7 +45,6 @@ export function useNotifications(): UseNotificationsResult {
       setLastUpdated(new Date());
 
       const state = await service.getState();
-      console.info("state", state);
       state.notifications = result.value;
       state.lastFetchedAt = new Date().toISOString();
       await service.saveState(state);

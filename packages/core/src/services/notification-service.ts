@@ -85,7 +85,6 @@ export class NotificationService {
 
     const data = await response.json();
     console.info(`${LOG_PREFIX}.fetch: fetched ${data.length} notifications`);
-    console.debug(`${LOG_PREFIX}.fetch: fetched data`, data);
     return ok(this.transformNotifications(data));
   }
 
