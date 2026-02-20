@@ -10,6 +10,9 @@
     "Productivity"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "commands": [
     {
       "name": "inbox",
@@ -60,6 +63,24 @@
       "required": false,
       "default": true,
       "label": "Enable native notifications"
+    },
+    {
+      "name": "autoStartListening",
+      "title": "Auto-start Listening",
+      "description": "Start polling when Raycast launches",
+      "type": "checkbox",
+      "required": false,
+      "default": false,
+      "label": "Auto-start background polling"
+    },
+    {
+      "name": "showReadNotifications",
+      "title": "Show Read Notifications",
+      "description": "Include already read notifications in the list",
+      "type": "checkbox",
+      "required": false,
+      "default": false,
+      "label": "Show read notifications"
     }
   ],
   "dependencies": {

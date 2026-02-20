@@ -13,7 +13,11 @@ type ExtensionPreferences = {
   /** Polling Interval - How often to check for new notifications */
   "pollingInterval": "30" | "60" | "120" | "300",
   /** Native Notifications - Show macOS notifications for new items */
-  "nativeNotifications": boolean
+  "nativeNotifications": boolean,
+  /** Auto-start Listening - Start polling when Raycast launches */
+  "autoStartListening": boolean,
+  /** Show Read Notifications - Include already read notifications in the list */
+  "showReadNotifications": boolean
 }
 
 /** Preferences accessible in all the extension's commands */
