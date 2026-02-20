@@ -26,10 +26,18 @@ declare type Preferences = ExtensionPreferences
 declare namespace Preferences {
   /** Preferences accessible in the `inbox` command */
   export type Inbox = ExtensionPreferences & {}
+  /** Preferences accessible in the `start-listening` command */
+  export type StartListening = ExtensionPreferences & {}
+  /** Preferences accessible in the `stop-listening` command */
+  export type StopListening = ExtensionPreferences & {}
 }
 
 declare namespace Arguments {
   /** Arguments passed to the `inbox` command */
   export type Inbox = {}
+  /** Arguments passed to the `start-listening` command */
+  export type StartListening = {}
+  /** Arguments passed to the `stop-listening` command */
+  export type StopListening = {}
 }
 

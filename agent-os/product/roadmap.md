@@ -32,35 +32,39 @@
 
 13. [ ] Filter by Repository — Add filtering to scope inbox to specific repositories `S`
 
-## Phase 4: Code Context & Replies
+## Phase 4: Code Context & Replies (GraphQL)
 
-14. [ ] Fetch Comment Details — Retrieve the latest comment content from the notification's latest_comment_url `S`
+> **API:** Uses GitHub GraphQL API for all content fetching. REST remains only for notification polling.
 
-15. [ ] Code Context Display — Parse and display diff hunks and file metadata for PR review comments as Markdown snippets `M`
+14. [ ] GraphQL Client Setup — Add GraphQL client to core package, reusing existing PAT auth `S`
 
-16. [ ] Reply to Comments — Add inline reply action that prompts for input and POSTs response via GitHub API `M`
+15. [ ] Fetch Review Threads — Query `pullRequest.reviewThreads` via GraphQL for grouped threads with `isResolved`, `path`, `line`, `diffSide`, and nested comments `M`
 
-17. [ ] Reply to PR Review Comments — Support replying specifically to PR review comment threads with proper API endpoints `S`
+16. [ ] Code Context Display — Render diff hunks and file metadata from review threads as Markdown in Raycast Detail view `M`
+
+17. [ ] Reply to Review Threads — Use `addPullRequestReviewComment` GraphQL mutation to reply inline `M`
+
+18. [ ] Resolve Latest Comment — Fetch comment details via GraphQL for richer native notifications (commenter, body preview) `S`
 
 ## Phase 5: Multi-Client Architecture
 
-18. [ ] Extract Core Interfaces — Refactor core logic (fetch, cache, actions) into platform-agnostic TypeScript interfaces and services `L`
+19. [ ] Extract Core Interfaces — Refactor core logic (fetch, cache, actions) into platform-agnostic TypeScript interfaces and services `L`
 
-19. [ ] Raycast Adapter — Wrap core services with Raycast-specific UI and storage implementations `M`
+20. [ ] Raycast Adapter — Wrap core services with Raycast-specific UI and storage implementations `M`
 
-20. [ ] VS Code Extension Scaffold — Create VS Code extension that implements core interfaces with VS Code APIs and command palette `L`
+21. [ ] VS Code Extension Scaffold — Create VS Code extension that implements core interfaces with VS Code APIs and command palette `L`
 
-21. [ ] Zed Extension Scaffold — Create Zed extension that implements core interfaces with Zed extension APIs `L`
+22. [ ] Zed Extension Scaffold — Create Zed extension that implements core interfaces with Zed extension APIs `L`
 
 ## Phase 6: Polish & Advanced Features
 
-22. [ ] Rate Limit Handling — Gracefully handle GitHub API rate limits with backoff and user feedback `S`
+23. [ ] Rate Limit Handling — Gracefully handle GitHub API rate limits with backoff and user feedback `S`
 
-23. [ ] Error States & Recovery — Display meaningful error messages and retry options for API failures `S`
+24. [ ] Error States & Recovery — Display meaningful error messages and retry options for API failures `S`
 
-24. [ ] Keyboard Shortcuts — Add customizable keyboard shortcuts for all major actions `S`
+25. [ ] Keyboard Shortcuts — Add customizable keyboard shortcuts for all major actions `S`
 
-25. [ ] Notification Grouping — Group notifications by repository or PR for cleaner inbox organization `M`
+26. [ ] Notification Grouping — Group notifications by repository or PR for cleaner inbox organization `M`
 
 > Notes
 > - Order follows technical dependencies: auth → fetch → display → actions → background → multi-platform
@@ -68,3 +72,8 @@
 > - Phase 3-4 adds the differentiated features (code context, inline replies)
 > - Phase 5 enables the long-term vision of multi-client support
 > - Each item is independently testable and deployable
+>
+> API Strategy
+> - **REST API**: Notification lifecycle only — `GET /notifications` (polling), `PATCH /notifications/threads/{id}` (mark done), `PUT /notifications/threads/{thread_id}/subscription` (subscribe). GitHub does not expose notifications via GraphQL.
+> - **GraphQL API**: All content fetching — PR review threads, comment details, reply mutations, participating PR search. Provides grouped threads, `isResolved` status, and batching that REST cannot.
+> - Both APIs authenticate with the same GitHub PAT (needs `notifications` + `repo` scopes).
