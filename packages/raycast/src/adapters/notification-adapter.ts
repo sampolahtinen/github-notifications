@@ -1,8 +1,5 @@
 import { showHUD } from "@raycast/api";
-import type {
-  NotificationDisplayProvider,
-  NotificationOptions,
-} from "@github-notifications/core";
+import type { NotificationDisplayProvider, NotificationOptions } from "@github-notifications/core";
 
 /**
  * Raycast implementation of NotificationDisplayProvider
@@ -13,7 +10,7 @@ export class RaycastNotificationAdapter implements NotificationDisplayProvider {
     title: string,
     body: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _options?: NotificationOptions
+    _options?: NotificationOptions,
   ): Promise<void> {
     await showHUD(`${title}: ${body}`);
   }

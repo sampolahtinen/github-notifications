@@ -19,6 +19,18 @@
       "title": "GitHub Inbox",
       "description": "View and manage your GitHub notifications",
       "mode": "view"
+    },
+    {
+      "name": "start-listening",
+      "title": "Start Listening",
+      "description": "Start background polling for GitHub notifications",
+      "mode": "no-view"
+    },
+    {
+      "name": "stop-listening",
+      "title": "Stop Listening",
+      "description": "Stop background polling for GitHub notifications",
+      "mode": "no-view"
     }
   ],
   "preferences": [

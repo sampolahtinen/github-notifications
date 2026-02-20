@@ -91,29 +91,29 @@ Actions available on notifications.
 
 Background polling for new notifications.
 
-- [ ] **8.1** Implement polling interval timer based on preferences
-- [ ] **8.2** Implement notification deduplication using seen IDs
-- [ ] **8.3** Detect new notifications by comparing with previous fetch
-- [ ] **8.4** Update cached notifications on each poll
-- [ ] **8.5** Handle polling errors gracefully (retry, backoff)
+- [x] **8.1** Implement polling interval timer based on preferences
+- [x] **8.2** Implement notification deduplication using seen IDs
+- [x] **8.3** Detect new notifications by comparing with previous fetch
+- [x] **8.4** Update cached notifications on each poll
+- [x] **8.5** Handle polling errors gracefully (retry, backoff)
 
 ### Group 9: Start/Stop Listening Commands
 
 Control background polling.
 
-- [ ] **9.1** Create "Start Listening" command that triggers immediate fetch and starts polling
-- [ ] **9.2** Create "Stop Listening" command that stops polling
-- [ ] **9.3** Show toast confirmation for start/stop actions
-- [ ] **9.4** Update inbox status indicator based on listening state
+- [x] **9.1** Create "Start Listening" command that triggers immediate fetch and starts polling
+- [x] **9.2** Create "Stop Listening" command that stops polling
+- [x] **9.3** Show toast confirmation for start/stop actions
+- [x] **9.4** Update inbox status indicator based on listening state
 
 ### Group 10: Native macOS Notifications
 
 System notifications for new items.
 
-- [ ] **10.1** Trigger native notification for single new notification (title, repo, reason)
-- [ ] **10.2** Trigger batch notification for 4+ new notifications (count + summary)
-- [ ] **10.3** Track notified IDs to prevent duplicate native notifications
-- [ ] **10.4** Respect "Native Notifications" preference toggle
+- [x] **10.1** Trigger native notification for single new notification (title, repo, reason)
+- [x] **10.2** Trigger batch notification for 4+ new notifications (count + summary)
+- [x] **10.3** Track notified IDs to prevent duplicate native notifications
+- [x] **10.4** Respect "Native Notifications" preference toggle
 
 ### Group 11: Caching & Persistence
 
