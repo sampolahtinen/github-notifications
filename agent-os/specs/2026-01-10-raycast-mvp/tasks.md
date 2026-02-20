@@ -16,6 +16,7 @@ Foundation types and services.
 
 - [x] **1.1** Define `Notification` interface with all fields (id, unread, reason, updatedAt, subject, repository)
 - [x] **1.2** Define `NotificationReason` type union (review_requested, mention, assign, comment, author, state_change, subscribed)
+  - ⚠️ **Needs update**: Add missing reason types from GitHub API: `approval_requested`, `ci_activity`, `invitation`, `manual`, `member_feature_requested`, `security_advisory_credit`, `security_alert`, `team_mention`
 - [x] **1.3** Define `PersistedState` interface for caching, deduplication, and user actions
 - [x] **1.4** Define `GitHubAuthProvider` interface for token management
 - [x] **1.5** Define `StorageProvider` interface for persistence
@@ -27,11 +28,14 @@ Foundation types and services.
 
 GitHub API client for fetching and managing notifications.
 
-- [x] **2.1** Implement GitHub notifications fetch (`GET /notifications`)
-- [x] **2.2** Implement mark notification as done (`PATCH /notifications/threads/{id}`)
+- [x] **2.1** Implement GitHub notifications fetch (`GET /notifications`) via REST API
+- [x] **2.2** Implement mark notification as done (`PATCH /notifications/threads/{id}`) via REST API
 - [x] **2.3** Implement token validation endpoint
 - [x] **2.4** Handle API rate limiting with appropriate headers
 - [x] **2.5** Transform GitHub API response to internal `Notification` type
+- [ ] **2.6** Add `participating=true` query parameter to notifications fetch for focused polling
+- [ ] **2.7** Add conditional request support (`If-Modified-Since` / `Last-Modified` headers) — 304 responses are free on rate limit
+- [ ] **2.8** Update `NotificationReason` type to include all 15 GitHub API reason types
 
 ### Group 3: Raycast Adapters
 
@@ -123,6 +127,21 @@ Local storage for offline support and performance.
 - [ ] **11.2** Store last fetched timestamp
 - [ ] **11.3** Store done notification IDs (local-only marks)
 - [ ] **11.4** Store user preferences state (last selected filter, repository)
+
+### Group 12: GraphQL Client Setup
+
+> **Package:** `@github-notifications/core`
+
+Set up GitHub GraphQL API client for content-rich features (thread view, comment details, replies). REST API remains for notifications polling (the only API that supports it).
+
+> **API Strategy:** REST for notification lifecycle (`GET /notifications`, mark as done, subscribe). GraphQL for all content fetching (PR details, review threads, comments, replies).
+
+- [ ] **12.1** Add `graphql-request` or lightweight GraphQL client to core package
+- [ ] **12.2** Create `GitHubGraphQLClient` class that uses the existing `GitHubAuthProvider` for token
+- [ ] **12.3** Implement `fetchLatestComment(url)` — resolve a notification's `latest_comment_url` to get commenter, body, and timestamp for richer native notifications
+- [ ] **12.4** Implement `fetchPRReviewThreads(owner, repo, prNumber)` — query `pullRequest.reviewThreads` with comments, `isResolved`, `path`, `line`, `diffSide`
+- [ ] **12.5** Implement `replyToReviewThread(threadId, body)` — `addPullRequestReviewComment` mutation
+- [ ] **12.6** Implement `fetchParticipatingPRs()` — GraphQL `search` query for open PRs the user is involved in (`reviewed-by:@me`, `author:@me`)
 
 ---
 
