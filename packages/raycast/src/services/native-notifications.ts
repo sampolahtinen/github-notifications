@@ -1,5 +1,5 @@
-import { showHUD } from "@raycast/api";
 import type { Notification, NotificationReason } from "@github-notifications/core";
+import { notificationCenter, preparePrebuilds } from "raycast-notifier";
 import { getReasonLabel } from "../utils";
 
 /**
@@ -7,12 +7,23 @@ import { getReasonLabel } from "../utils";
  */
 const BATCH_THRESHOLD = 4;
 
+let prebuildsReady = false;
+
+async function ensurePrebuilds(): Promise<void> {
+  if (!prebuildsReady) {
+    await preparePrebuilds();
+    prebuildsReady = true;
+  }
+}
+
 /**
  * Send native macOS notifications for new GitHub notifications.
  * Shows individual notifications for 1-3 items, or a batch summary for 4+.
  */
 export async function sendNativeNotifications(newNotifications: Notification[]): Promise<void> {
   if (newNotifications.length === 0) return;
+
+  await ensurePrebuilds();
 
   if (newNotifications.length >= BATCH_THRESHOLD) {
     await showBatchNotification(newNotifications);
@@ -24,24 +35,32 @@ export async function sendNativeNotifications(newNotifications: Notification[]):
 }
 
 /**
- * Show a native notification for a single GitHub notification
+ * Show a native macOS notification for a single GitHub notification
  */
 async function showSingleNotification(notification: Notification): Promise<void> {
   const reason = getReasonLabel(notification.reason);
-  const title = `GitHub - ${reason}`;
-  const body = `${notification.subject.title}\n${notification.repository.fullName}`;
 
-  await showHUD(`${title}: ${body}`);
+  await notificationCenter({
+    title: `GitHub - ${reason}`,
+    subtitle: notification.repository.fullName,
+    message: notification.subject.title,
+    sound: "default",
+  });
 }
 
 /**
- * Show a batch native notification when 4+ new notifications arrive
+ * Show a batch native macOS notification when 4+ new notifications arrive
  */
 async function showBatchNotification(notifications: Notification[]): Promise<void> {
   const count = notifications.length;
   const summary = buildBatchSummary(notifications);
 
-  await showHUD(`GitHub Notifications: You have ${count} new notifications - ${summary}`);
+  await notificationCenter({
+    title: "GitHub Notifications",
+    subtitle: `${count} new notifications`,
+    message: summary,
+    sound: "default",
+  });
 }
 
 /**
