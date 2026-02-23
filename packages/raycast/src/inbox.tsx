@@ -8,7 +8,8 @@ import {
 } from "@raycast/api";
 import type { NotificationReason } from "@github-notifications/core";
 import { useNotifications } from "./hooks/useNotifications";
-import { formatRelativeTime, getReasonIcon, getReasonLabel } from "./utils";
+import { formatRelativeTime, getReasonIcon, getReasonLabel, parsePRFromNotification } from "./utils";
+import { ThreadList } from "./views/thread-list";
 
 const REASON_OPTIONS: { value: NotificationReason | "all"; title: string }[] = [
   { value: "all", title: "All Notifications" },
@@ -119,6 +120,7 @@ export default function Command() {
                   .replace("api.github.com/repos", "github.com")
                   .replace("/pulls/", "/pull/")
               : `https://github.com/${notification.repository.fullName}`;
+            const prIdentifier = parsePRFromNotification(notification);
 
             return (
               <List.Item
@@ -158,6 +160,20 @@ export default function Command() {
                         title="Open in Browser"
                         url={browserUrl}
                       />
+                      {prIdentifier && (
+                        <Action.Push
+                          title="View Review Threads"
+                          icon={Icon.Bubble}
+                          shortcut={{ modifiers: ["cmd"], key: "t" }}
+                          target={
+                            <ThreadList
+                              owner={prIdentifier.owner}
+                              repo={prIdentifier.repo}
+                              prNumber={prIdentifier.prNumber}
+                            />
+                          }
+                        />
+                      )}
                       <Action
                         title="Mark as Done"
                         icon={Icon.Checkmark}

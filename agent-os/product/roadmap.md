@@ -34,13 +34,13 @@
 
 ## Phase 4: Code Context & Replies
 
-14. [ ] Fetch Comment Details — Retrieve the latest comment content from the notification's latest_comment_url `S`
+14. [x] Fetch Comment Details — Retrieve the latest comment content from the notification's latest_comment_url `S`
 
-15. [ ] Code Context Display — Parse and display diff hunks and file metadata for PR review comments as Markdown snippets `M`
+15. [x] Code Context Display — Parse and display diff hunks and file metadata for PR review comments as Markdown snippets `M`
 
-16. [ ] Reply to Comments — Add inline reply action that prompts for input and POSTs response via GitHub API `M`
+16. [x] Reply to Comments — Add inline reply action that prompts for input and POSTs response via GitHub API `M`
 
-17. [ ] Reply to PR Review Comments — Support replying specifically to PR review comment threads with proper API endpoints `S`
+17. [x] Reply to PR Review Comments — Support replying specifically to PR review comment threads with proper API endpoints `S`
 
 ## Phase 5: Multi-Client Architecture
 
@@ -63,7 +63,7 @@
 25. [ ] Notification Grouping — Group notifications by repository or PR for cleaner inbox organization `M`
 
 > Notes
-> - Order follows technical dependencies: auth → fetch → display → actions → background → multi-platform
+> - Order follows technical dependencies: auth -> fetch -> display -> actions -> background -> multi-platform
 > - Phase 1-2 delivers a functional MVP with core value proposition
 > - Phase 3-4 adds the differentiated features (code context, inline replies)
 > - Phase 5 enables the long-term vision of multi-client support
