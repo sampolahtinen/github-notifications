@@ -1,11 +1,4 @@
-import {
-  List,
-  ActionPanel,
-  Action,
-  Icon,
-  Color,
-  openExtensionPreferences,
-} from "@raycast/api";
+import { List, ActionPanel, Action, Icon, Color, openExtensionPreferences } from "@raycast/api";
 import type { NotificationReason } from "@github-notifications/core";
 import { useNotifications } from "./hooks/useNotifications";
 import { formatRelativeTime, getReasonIcon, getReasonLabel } from "./utils";
@@ -26,6 +19,7 @@ export default function Command() {
     notifications,
     allNotifications,
     isLoading,
+    isListening,
     error,
     refresh,
     markAsDone,
@@ -36,24 +30,25 @@ export default function Command() {
     showReadNotifications,
     toggleShowReadNotifications,
     lastUpdated,
+    startListening,
+    stopListening,
   } = useNotifications();
 
-  // Dedupe repositories for filter menu (use all notifications, not filtered)
   const repositories = Array.from(
-    new Map(
-      allNotifications.map((n) => [n.repository.id, n.repository])
-    ).values()
+    new Map(allNotifications.map((n) => [n.repository.id, n.repository])).values(),
   );
 
-  // Get active repo name for display
   const activeRepoName =
     filterRepository !== "all"
       ? repositories.find((r) => r.id === Number(filterRepository))?.fullName
       : null;
 
-  const subtitle = lastUpdated
-    ? `${notifications.length} notifications · Updated ${formatRelativeTime(lastUpdated.toISOString())}`
-    : `${notifications.length} notifications`;
+  const statusPrefix = isListening ? "Listening" : "Not listening";
+  const statusIndicator = isListening ? "\u{1F7E2}" : "\u{26AA}";
+  const updatedSuffix = lastUpdated
+    ? ` \u00B7 Updated ${formatRelativeTime(lastUpdated.toISOString())}`
+    : "";
+  const subtitle = `${statusIndicator} ${statusPrefix} \u00B7 ${notifications.length} notifications${updatedSuffix}`;
 
   if (error) {
     return (
@@ -64,11 +59,7 @@ export default function Command() {
           description="Check your internet connection or GitHub token"
           actions={
             <ActionPanel>
-              <Action
-                title="Retry"
-                icon={Icon.RotateClockwise}
-                onAction={refresh}
-              />
+              <Action title="Retry" icon={Icon.RotateClockwise} onAction={refresh} />
               <Action
                 title="Open Preferences"
                 icon={Icon.Gear}
@@ -84,29 +75,23 @@ export default function Command() {
   return (
     <List
       isLoading={isLoading}
-      navigationTitle={activeRepoName ? `📁 ${activeRepoName}` : "GitHub Inbox"}
+      navigationTitle={activeRepoName ? `\u{1F4C1} ${activeRepoName}` : "GitHub Inbox"}
       searchBarPlaceholder="Search notifications..."
       searchBarAccessory={
         <List.Dropdown
           tooltip="Filter by reason"
           value={filterReason}
-          onChange={(value) =>
-            setFilterReason(value as NotificationReason | "all")
-          }
+          onChange={(value) => setFilterReason(value as NotificationReason | "all")}
         >
           {REASON_OPTIONS.map((option) => (
-            <List.Dropdown.Item
-              key={option.value}
-              title={option.title}
-              value={option.value}
-            />
+            <List.Dropdown.Item key={option.value} title={option.title} value={option.value} />
           ))}
         </List.Dropdown>
       }
     >
       {notifications.length === 0 && !isLoading ? (
         <List.EmptyView
-          icon="🎉"
+          icon="\u{1F389}"
           title="No notifications"
           description="You're all caught up!"
         />
@@ -134,9 +119,7 @@ export default function Command() {
                   {
                     tag: {
                       value: notification.unread ? "Unread" : "Read",
-                      color: notification.unread
-                        ? Color.Blue
-                        : Color.SecondaryText,
+                      color: notification.unread ? Color.Blue : Color.SecondaryText,
                     },
                   },
                   {
@@ -154,16 +137,30 @@ export default function Command() {
                 actions={
                   <ActionPanel>
                     <ActionPanel.Section>
-                      <Action.OpenInBrowser
-                        title="Open in Browser"
-                        url={browserUrl}
-                      />
+                      <Action.OpenInBrowser title="Open in Browser" url={browserUrl} />
                       <Action
                         title="Mark as Done"
                         icon={Icon.Checkmark}
                         shortcut={{ modifiers: ["cmd"], key: "d" }}
                         onAction={() => markAsDone(notification.id)}
                       />
+                    </ActionPanel.Section>
+                    <ActionPanel.Section title="Listening">
+                      {isListening ? (
+                        <Action
+                          title="Stop Listening"
+                          icon={Icon.Stop}
+                          shortcut={{ modifiers: ["cmd"], key: "l" }}
+                          onAction={stopListening}
+                        />
+                      ) : (
+                        <Action
+                          title="Start Listening"
+                          icon={Icon.Play}
+                          shortcut={{ modifiers: ["cmd"], key: "l" }}
+                          onAction={startListening}
+                        />
+                      )}
                     </ActionPanel.Section>
                     <ActionPanel.Section title="Filter">
                       <ActionPanel.Submenu
@@ -173,11 +170,7 @@ export default function Command() {
                       >
                         <Action
                           title="All Repositories"
-                          icon={
-                            filterRepository === "all"
-                              ? Icon.Checkmark
-                              : Icon.Circle
-                          }
+                          icon={filterRepository === "all" ? Icon.Checkmark : Icon.Circle}
                           onAction={() => setFilterRepository("all")}
                         />
                         {repositories.map((repo) => (
@@ -185,13 +178,9 @@ export default function Command() {
                             key={repo.id}
                             title={repo.fullName}
                             icon={
-                              filterRepository === String(repo.id)
-                                ? Icon.Checkmark
-                                : Icon.Circle
+                              filterRepository === String(repo.id) ? Icon.Checkmark : Icon.Circle
                             }
-                            onAction={() =>
-                              setFilterRepository(String(repo.id))
-                            }
+                            onAction={() => setFilterRepository(String(repo.id))}
                           />
                         ))}
                       </ActionPanel.Submenu>
@@ -211,9 +200,7 @@ export default function Command() {
                             ? "Hide Read Notifications"
                             : "Show Read Notifications"
                         }
-                        icon={
-                          showReadNotifications ? Icon.EyeDisabled : Icon.Eye
-                        }
+                        icon={showReadNotifications ? Icon.EyeDisabled : Icon.Eye}
                         shortcut={{ modifiers: ["cmd"], key: "r" }}
                         onAction={toggleShowReadNotifications}
                       />
