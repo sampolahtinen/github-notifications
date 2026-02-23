@@ -8,6 +8,8 @@
 
 ### Monorepo Structure
 
+demo
+
 The project is organized as a TypeScript monorepo with shared packages:
 
 - **@github-notifications/core** — Business logic, GitHub API client, domain interfaces
